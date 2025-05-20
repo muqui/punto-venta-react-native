@@ -6,12 +6,15 @@ import HomeScreen from './src/screens/HomeScreen';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuthStore } from './src/store/store';
+import { CustomDrawerContent } from './src/components/CustomDrawerContent';
+import InvetoryScreen from './src/screens/InventoryScreen';
 
 // Definir tipos para las rutas
 type DrawerParamList = {
   Home: undefined;
   Settings: undefined;
   Products: undefined;
+  Inventory: undefined;
 };
 
 // Crear el Drawer Navigator
@@ -19,32 +22,27 @@ const Drawer = createDrawerNavigator<DrawerParamList>();
 
 export default function App() {
   const { token, user, setToken, logout } = useAuthStore();
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const storedToken = await AsyncStorage.getItem('userToken');
-      if (storedToken) {
-        setToken(storedToken); // Actualiza el estado global de Zustand
-      }
-      setIsLoading(false);
-    };
-    checkAuth();
-  }, []);
-
-  if (isLoading) return null; // Evita renderizar mientras se carga el token
+console.log(token)
+ 
 
   return (
     <>
       {!token ? (
         // Mostrar Login si no está autenticado
-        <LoginScreen onLogin={() => {}} />
+        <LoginScreen />
       ) : (
         // Mostrar el NavigationContainer si está autenticado
         <NavigationContainer>
-          <Drawer.Navigator initialRouteName="Home">
+          <Drawer.Navigator initialRouteName="Home"
+              drawerContent={(props) => <CustomDrawerContent {...props} />} // Usar el CustomDrawerContent
+
+          >
             <Drawer.Screen name="Home">
-              {(props) => <HomeScreen {...props} onLogout={logout} />}
+              {(props) => <HomeScreen />}
+            </Drawer.Screen>
+            <Drawer.Screen name="Inventory">
+              {(props) => <InvetoryScreen />}
             </Drawer.Screen>
           </Drawer.Navigator>
         </NavigationContainer>

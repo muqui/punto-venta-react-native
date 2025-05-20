@@ -6,13 +6,13 @@ type Props = {
   onLogout: () => void;
 };
 
-export default function HomeScreen({ onLogout }: Props) {
+export default function HomeScreen() {
   //const logout = useAuthStore((state) => state.logout);
   const { user, logout } = useAuthStore();
-
+  
   const handleLogout = () => {
     logout(); // Borra token y usuario
-    onLogout(); // Llama a la función de `App.tsx` para volver al login
+   // onLogout(); // Llama a la función de `App.tsx` para volver al login
   };
 
   return (
@@ -21,12 +21,12 @@ export default function HomeScreen({ onLogout }: Props) {
       {user ? (
         <>
          
-          <Text style={styles.userInfo}>Email: {user.email}</Text>
+          <Text style={styles.userInfo}>Email: {user.name}</Text>
         </>
       ) : (
         <Text style={styles.userInfo}>No hay usuario registrado</Text>
       )}
-      <Button title="Cerrar Sesión" onPress={handleLogout} color="red" />
+     
     </View>
   );
 }

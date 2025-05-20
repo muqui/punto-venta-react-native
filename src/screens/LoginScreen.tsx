@@ -3,43 +3,38 @@ import { View, TextInput, Button, StyleSheet, Alert, Image, Text } from 'react-n
 import { useAuthStore } from '../store/store';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
+import { buildUrl, API_URLS } from '../config/apiConfig';
 
 const validationSchema = Yup.object().shape({
-  email: Yup.string().email('Email inválido').required('El email es obligatorio'),
+  identifier: Yup.string().email('Email inválido').required('El email es obligatorio'),
   password: Yup.string().min(6, 'Mínimo 6 caracteres').required('La contraseña es obligatoria'),
 });
 
-type Props = {
-  onLogin: () => void;
-};
-
-export default function LoginScreen({ onLogin }: Props) {
+export default function LoginScreen() {
   const setToken = useAuthStore((state) => state.setToken);
 
-  const handleLogin = async (values: { email: string; password: string }) => {
+  const handleLogin = async (values: { identifier: string; password: string }) => {
+    console.log(`Valores ${values.identifier}`);
     try {
-      const response = await fetch('https://back-navarro-pos.duckdns.org/auth/signin', {
-        method: 'POST',
+      const response = await axios.post(buildUrl(API_URLS.auth), values, {
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
       });
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (!response.ok) {
-        Alert.alert('Error', data.message || 'Credenciales incorrectas');
-        return;
+      // Guardar token en estado global (store)
+      setToken(data.token);
+      // await AsyncStorage.setItem('userToken', data.token);
+      // Alert.alert('Login exitoso', 'Has iniciado sesión correctamente');
+      
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.message || 'Credenciales incorrectas';
+        Alert.alert('Error', message);
+      } else {
+        Alert.alert('Error', 'Hubo un problema con el servidor');
       }
-
-       // Almacenamos el token en el estado global (store) y en AsyncStorage
-       setToken(data.token);
-       await AsyncStorage.setItem('userToken', data.token);
-      Alert.alert('Login exitoso', 'Has iniciado sesión correctamente');
-      onLogin();
-    } catch (error) {
-      Alert.alert('Error', 'Hubo un problema con el servidor');
     }
   };
 
@@ -48,20 +43,20 @@ export default function LoginScreen({ onLogin }: Props) {
       <Image source={require('../../assets/navarro-pos-logo.png')} style={styles.logo} resizeMode="contain" />
       
       <Formik
-        initialValues={{ email: '', password: '' }}
+        initialValues={{ identifier: 'muqui@hotmail.com', password: '123456' }}
         validationSchema={validationSchema}
         onSubmit={handleLogin}
       >
         {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
           <>
             <TextInput
-              placeholder="Email"
-              value={values.email}
-              onChangeText={handleChange('email')}
-              onBlur={handleBlur('email')}
+              placeholder="identifier"
+              value={values.identifier}
+              onChangeText={handleChange('identifier')}
+              onBlur={handleBlur('identifier')}
               style={styles.input}
             />
-            {touched.email && errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+            {touched.identifier && errors.identifier && <Text style={styles.errorText}>{errors.identifier}</Text>}
 
             <TextInput
               placeholder="Password"

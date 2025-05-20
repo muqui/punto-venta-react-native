@@ -3,6 +3,7 @@ import { jwtDecode } from "jwt-decode";
 
 type UserToken = {
   email: string;
+  name: string;
   exp: number;
   iat: number;
   roles: string[];
@@ -22,6 +23,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (token) {
       try {
         const decodedUser = jwtDecode<UserToken>(token);
+        
         set({ token, user: decodedUser });
       } catch (error) {
         console.error("Error decodificando el token:", error);
