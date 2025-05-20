@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuthStore } from './src/store/store';
 import { CustomDrawerContent } from './src/components/CustomDrawerContent';
 import InvetoryScreen from './src/screens/InventoryScreen';
+import { CheckPricer } from './src/screens/CheckPricer';
 
 // Definir tipos para las rutas
 type DrawerParamList = {
@@ -43,6 +44,9 @@ console.log(token)
             </Drawer.Screen>
             <Drawer.Screen name="Inventory">
               {(props) => <InvetoryScreen />}
+            </Drawer.Screen>
+            <Drawer.Screen name="Check Price">
+              {(props) => <CheckPricer />}
             </Drawer.Screen>
           </Drawer.Navigator>
         </NavigationContainer>
